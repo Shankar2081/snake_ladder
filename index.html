@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake and Ladder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: url('https://images.unsplash.com/photo-1600475076600-b4701a5a1dd1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1920') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        .game-container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 50px);
+            grid-gap: 1px;
+            margin: 20px auto;
+            background-color: #222;
+            width: 500px;
+            height: 500px;
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+        }
+        .player {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+        .player1 {
+            background-color: red;
+        }
+        .player2 {
+            background-color: blue;
+        }
+        .roll-button {
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Snake and Ladder</h1>
+        <div id="board" class="board"></div>
+        <div>
+            <button id="rollDiceButton" class="btn btn-primary roll-button">Roll Dice</button>
+            <p id="diceResult" class="mt-3">Dice: 0</p>
+            <p id="turnInfo">Player 1's Turn</p>
+        </div>
+        <audio id="diceSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const diceResult = document.getElementById('diceResult');
+        const turnInfo = document.getElementById('turnInfo');
+        const diceSound = document.getElementById('diceSound');
+        const rollDiceButton = document.getElementById('rollDiceButton');
+
+        let cells = [];
+        let player1Position = 0;
+        let player2Position = 0;
+        let currentPlayer = 1;
+
+        function createBoard() {
+            for (let i = 100; i > 0; i--) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = i;
+                board.appendChild(cell);
+                cells.push(cell);
+            }
+        }
+
+        function movePlayer(player, position) {
+            cells.forEach(cell => cell.innerHTML = cell.innerHTML.replace(/<div class="player.*<\/div>/g, ''));
+
+            if (player === 1 && position <= 100) {
+                const player1Div = '<div class="player player1"></div>';
+                cells[100 - position].innerHTML += player1Div;
+            } else if (player === 2 && position <= 100) {
+                const player2Div = '<div class="player player2"></div>';
+                cells[100 - position].innerHTML += player2Div;
+            }
+        }
+
+        function rollDice() {
+            diceSound.play();
+            const diceRoll = Math.floor(Math.random() * 6) + 1;
+            diceResult.textContent = `Dice: ${diceRoll}`;
+
+            if (currentPlayer === 1) {
+                player1Position += diceRoll;
+                if (player1Position > 100) player1Position = 100;
+                movePlayer(1, player1Position);
+                currentPlayer = 2;
+                turnInfo.textContent = "Player 2's Turn";
+            } else {
+                player2Position += diceRoll;
+                if (player2Position > 100) player2Position = 100;
+                movePlayer(2, player2Position);
+                currentPlayer = 1;
+                turnInfo.textContent = "Player 1's Turn";
+            }
+
+            checkWin();
+        }
+
+        function checkWin() {
+            if (player1Position === 100) {
+                alert('Player 1 Wins!');
+                resetGame();
+            } else if (player2Position === 100) {
+                alert('Player 2 Wins!');
+                resetGame();
+            }
+        }
+
+        function resetGame() {
+            player1Position = 0;
+            player2Position = 0;
+            currentPlayer = 1;
+            turnInfo.textContent = "Player 1's Turn";
+            diceResult.textContent = "Dice: 0";
+            cells.forEach(cell => cell.innerHTML = cell.textContent);
+        }
+
+        rollDiceButton.addEventListener('click', rollDice);
+
+        createBoard();
+    </script>
+</body>
+</html>
