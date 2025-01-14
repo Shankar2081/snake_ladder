@@ -28,6 +28,7 @@
             background-color: #222;
             width: 500px;
             height: 500px;
+            position: relative;
         }
         .cell {
             width: 50px;
@@ -38,6 +39,20 @@
             font-size: 0.8rem;
             background-color: #f9f9f9;
             border: 1px solid #ccc;
+        }
+        .snake {
+            position: absolute;
+            background: green;
+            width: 5px;
+            height: 100px;
+            transform: rotate(45deg);
+        }
+        .ladder {
+            position: absolute;
+            background: brown;
+            width: 5px;
+            height: 100px;
+            transform: rotate(-45deg);
         }
         .player {
             width: 20px;
@@ -58,7 +73,32 @@
 <body>
     <div class="game-container">
         <h1>Snake and Ladder</h1>
-        <div id="board" class="board"></div>
+        <div id="playerSelection" class="mb-4">
+            <h5>Choose your pawns:</h5>
+            <div class="d-flex justify-content-center">
+                <div class="me-3">
+                    <label for="player1Pawn">Player 1:</label>
+                    <select id="player1Pawn" class="form-select">
+                        <option value="red">Red</option>
+                        <option value="yellow">Yellow</option>
+                        <option value="green">Green</option>
+                        <option value="purple">Purple</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="player2Pawn">Player 2:</label>
+                    <select id="player2Pawn" class="form-select">
+                        <option value="blue">Blue</option>
+                        <option value="orange">Orange</option>
+                        <option value="pink">Pink</option>
+                        <option value="cyan">Cyan</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="board" class="board">
+            <!-- Snakes and Ladders can be drawn here using CSS and positioned elements -->
+        </div>
         <div>
             <button id="rollDiceButton" class="btn btn-primary roll-button">Roll Dice</button>
             <p id="diceResult" class="mt-3">Dice: 0</p>
@@ -73,11 +113,17 @@
         const turnInfo = document.getElementById('turnInfo');
         const diceSound = document.getElementById('diceSound');
         const rollDiceButton = document.getElementById('rollDiceButton');
+        const player1Pawn = document.getElementById('player1Pawn');
+        const player2Pawn = document.getElementById('player2Pawn');
 
         let cells = [];
         let player1Position = 0;
         let player2Position = 0;
         let currentPlayer = 1;
+        let playerColors = {
+            1: 'red',
+            2: 'blue',
+        };
 
         function createBoard() {
             for (let i = 100; i > 0; i--) {
@@ -93,11 +139,11 @@
             cells.forEach(cell => cell.innerHTML = cell.innerHTML.replace(/<div class="player.*<\/div>/g, ''));
 
             if (player === 1 && position <= 100) {
-                const player1Div = '<div class="player player1"></div>';
-                cells[100 - position].innerHTML += player1Div;
+                const playerDiv = `<div class="player" style="background-color: ${playerColors[1]};"></div>`;
+                cells[100 - position].innerHTML += playerDiv;
             } else if (player === 2 && position <= 100) {
-                const player2Div = '<div class="player player2"></div>';
-                cells[100 - position].innerHTML += player2Div;
+                const playerDiv = `<div class="player" style="background-color: ${playerColors[2]};"></div>`;
+                cells[100 - position].innerHTML += playerDiv;
             }
         }
 
@@ -142,7 +188,11 @@
             cells.forEach(cell => cell.innerHTML = cell.textContent);
         }
 
-        rollDiceButton.addEventListener('click', rollDice);
+        rollDiceButton.addEventListener('click', () => {
+            playerColors[1] = player1Pawn.value;
+            playerColors[2] = player2Pawn.value;
+            rollDice();
+        });
 
         createBoard();
     </script>
